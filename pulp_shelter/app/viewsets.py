@@ -54,7 +54,7 @@ class AnimalViewSet(core.ContentViewSet):
     @transaction.atomic
     def create(self, request):
         """
-        Perform bookkeeping when saving Content.
+        Create a new Animal
 
         "Artifacts" need to be popped off and saved indpendently, as they are not actually part
         of the Content model.
