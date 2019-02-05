@@ -9,7 +9,7 @@ from pulpcore.plugin.stages import (
     Stage
 )
 
-from pulp_shelter.app.models import ShelterContent, ShelterRemote
+from pulp_shelter.app.models import Animal, ShelterRemote
 
 
 log = logging.getLogger(__name__)

@@ -46,17 +46,17 @@ class Animal(Content):
 
     species = models.CharField(max_length=255)
     breed = models.CharField(max_length=255)
-    name = 	models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
     age = models.IntegerField()
-    sex	= models.ChoiceField(choices = GENDER_CHOICES, default=UNKNOWN)
+    sex = models.TextField(choices=GENDER_CHOICES, default=UNKNOWN)
     weight = models.FloatField()
     bio = models.TextField()
     shelter = models.CharField(max_length=255)
     reserved = models.BooleanField(default=False)
-    picture	= models.CharField(max_length=255, unique=True)
+    picture = models.CharField(max_length=255, unique=True)
 
     class Meta:
-        unique_together = (species, breed, name, shelter)
+        unique_together = ('species', 'breed', 'name', 'shelter')
 
 
 class ShelterPublisher(Publisher):
