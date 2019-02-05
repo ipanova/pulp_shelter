@@ -46,7 +46,6 @@ class AnimalSerializer(platform.SingleArtifactContentSerializer):
     )
     age = serializers.IntegerField(
         help_text="Age of an animal when it arrived to a shelter",
-        allow_blank=True,
         required=False
     )
     sex	= serializers.ChoiceField(
@@ -56,13 +55,11 @@ class AnimalSerializer(platform.SingleArtifactContentSerializer):
     )
     weight = serializers.FloatField(
         help_text="Weight of an animal upon arrival to a shelter",
-        allow_blank=True,
         required=False
     )
-    bio = serializers.TextField(
+    bio = serializers.CharField(
         help_text="All information available about an animal",
-        allow_blank=True,
-        required=False
+        required=False,
     )
     shelter = serializers.CharField(
         help_text="Name of a shelter the animal is currently in or a name of the last shelter "
