@@ -62,14 +62,14 @@ class AnimalViewSet(core.ContentViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        _artifact = serializer.validated_data.pop('_artifact')
+        artifact = serializer.validated_data.pop('_artifact')
         content = serializer.save()
 
         if content.pk:
             ContentArtifact.objects.create(
                 artifact=artifact,
                 content=content,
-                relative_path=content.relative_path
+                relative_path=content.picture
             )
 
         headers = self.get_success_headers(serializer.data)

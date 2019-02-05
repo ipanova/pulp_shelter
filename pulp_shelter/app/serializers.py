@@ -48,10 +48,10 @@ class AnimalSerializer(platform.SingleArtifactContentSerializer):
         help_text="Age of an animal when it arrived to a shelter",
         required=False
     )
-    sex	= serializers.ChoiceField(
+    sex = serializers.ChoiceField(
         help_text="Gender of an animal",
-        choices = models.Animal.GENDER_CHOICES,
-        default = models.Animal.UNKNOWN
+        choices=models.Animal.GENDER_CHOICES,
+        default=models.Animal.UNKNOWN
     )
     weight = serializers.FloatField(
         help_text="Weight of an animal upon arrival to a shelter",
