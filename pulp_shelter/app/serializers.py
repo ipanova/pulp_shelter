@@ -44,6 +44,10 @@ class AnimalSerializer(platform.SingleArtifactContentSerializer):
     name = serializers.CharField(
         help_text="Name of an animal in a shelter"
     )
+    shelter = serializers.CharField(
+        help_text="Name of a shelter the animal is currently in or a name of the last shelter "
+                  "in case it was adopted"
+    )
     age = serializers.IntegerField(
         help_text="Age of an animal when it arrived to a shelter",
         required=False
@@ -59,14 +63,11 @@ class AnimalSerializer(platform.SingleArtifactContentSerializer):
     )
     bio = serializers.CharField(
         help_text="All information available about an animal",
-        required=False,
-    )
-    shelter = serializers.CharField(
-        help_text="Name of a shelter the animal is currently in or a name of the last shelter "
-                  "in case it was adopted"
+        default='',
     )
     reserved = serializers.BooleanField(
-        help_text="A flag to show if an animal is reserved for adoption"
+        help_text="A flag to show if an animal is reserved for adoption",
+        default=False,
     )
     picture = serializers.CharField(
         help_text="Relative path to an animal's picture in a repository"
