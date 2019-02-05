@@ -14,9 +14,9 @@ from pulpcore.plugin.models import Content, ContentArtifact, Remote, Publisher
 logger = getLogger(__name__)
 
 
-class ShelterContent(Content):
+class Animal(Content):
     """
-    The "shelter" content type.
+    The "animal" content type.
 
     Define fields you need for your new content type and
     specify uniqueness constraint to identify unit of this type.
@@ -30,13 +30,38 @@ class ShelterContent(Content):
         class Meta:
             unique_together = (field1, field2)
     """
+    TYPE = 'animal'
 
-    TYPE = 'shelter'
+    MALE = 'male'
+    FEMALE = 'female'
+    HERMAPHRODITE = 'hermaphrodite'
+    UNKNOWN = 'unknown'
+
+    GENDER_CHOICES = (
+        (MALE, MALE),
+        (FEMALE, FEMALE),
+        (HERMAPHRODITE, HERMAPHRODITE),
+        (UNKNOWN, UNKNOWN)
+    )
+
+    species = models.CharField(max_length=255)
+    breed = models.CharField(max_length=255)
+    name = 	models.CharField(max_length=255)
+    age = models.IntegerField()
+    sex	= models.ChoiceField(choices = GENDER_CHOICES, default=UNKNOWN)
+    weight = models.FloatField()
+    bio = models.TextField()
+    shelter = models.CharField(max_length=255)
+    reserved = models.BooleanField(default=False)
+    picture	= models.CharField(max_length=255, unique=True)
+
+    class Meta:
+        unique_together = (species, breed, name, shelter)
 
 
 class ShelterPublisher(Publisher):
     """
-    A Publisher for ShelterContent.
+    A Publisher for Animal.
 
     Define any additional fields for your new publisher if needed.
     """
@@ -46,7 +71,7 @@ class ShelterPublisher(Publisher):
 
 class ShelterRemote(Remote):
     """
-    A Remote for ShelterContent.
+    A Remote for Animal.
 
     Define any additional fields for your new importer if needed.
     """

@@ -23,16 +23,33 @@ from pulpcore.plugin.models import ContentArtifact
 from . import models, serializers, tasks
 
 
-class ShelterContentFilter(core.ContentFilter):
+class AnimalFilter(core.ContentFilter):
     """
-    FilterSet for ShelterContent.
+    FilterSet for Animal.
     """
 
     class Meta:
-        model = models.ShelterContent
+        model = models.Animal
         fields = [
-            # ...
+            'species', 'breed', 'shelter'
         ]
+
+
+class AnimalViewSet(core.ContentViewSet):
+    """
+    A ViewSet for Animal.
+
+    Define endpoint name which will appear in the API endpoint for this content type.
+    For example::
+        http://pulp.example.com/pulp/api/v3/content/shelter/units/
+
+    Also specify queryset and serializer for ShelterContent.
+    """
+
+    endpoint_name = 'animal'
+    queryset = models.Animal.objects.all()
+    serializer_class = serializers.AnimalSerializer
+    filterset_class = AnimalFilter
 
     @transaction.atomic
     def create(self, request):
@@ -42,68 +59,21 @@ class ShelterContentFilter(core.ContentFilter):
         "Artifacts" need to be popped off and saved indpendently, as they are not actually part
         of the Content model.
         """
-        raise NotImplementedError("FIXME")
-        # This requires some choice. Depending on the properties of your content type - whether it
-        # can have zero, one, or many artifacts associated with it, and whether any properties of
-        # the artifact bleed into the content type (such as the digest), you may want to make
-        # those changes here.
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # A single artifact per content, serializer subclasses SingleArtifactContentSerializer
-        # ======================================
-        # _artifact = serializer.validated_data.pop('_artifact')
-        # # you can save model fields directly, e.g. .save(digest=_artifact.sha256)
-        # content = serializer.save()
-        #
-        # if content.pk:
-        #     ContentArtifact.objects.create(
-        #         artifact=artifact,
-        #         content=content,
-        #         relative_path= ??
-        #     )
-        # =======================================
+        _artifact = serializer.validated_data.pop('_artifact')
+        content = serializer.save()
 
-        # Many artifacts per content, serializer subclasses MultipleArtifactContentSerializer
-        # =======================================
-        # _artifacts = serializer.validated_data.pop('_artifacts')
-        # content = serializer.save()
-        #
-        # if content.pk:
-        #   # _artifacts is a dictionary of {'relative_path': 'artifact'}
-        #   for relative_path, artifact in _artifacts.items():
-        #       ContentArtifact.objects.create(
-        #           artifact=artifact,
-        #           content=content,
-        #           relative_path=relative_path
-        #       )
-        # ========================================
-
-        # No artifacts, serializer subclasses NoArtifactContentSerialier
-        # ========================================
-        # content = serializer.save()
-        # ========================================
+        if content.pk:
+            ContentArtifact.objects.create(
+                artifact=artifact,
+                content=content,
+                relative_path=content.relative_path
+            )
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-
-class ShelterContentViewSet(core.ContentViewSet):
-    """
-    A ViewSet for ShelterContent.
-
-    Define endpoint name which will appear in the API endpoint for this content type.
-    For example::
-        http://pulp.example.com/pulp/api/v3/content/shelter/units/
-
-    Also specify queryset and serializer for ShelterContent.
-    """
-
-    endpoint_name = 'shelter'
-    queryset = models.ShelterContent.objects.all()
-    serializer_class = serializers.ShelterContentSerializer
-    filterset_class = ShelterContentFilter
 
 
 class ShelterRemoteFilter(core.RemoteFilter):

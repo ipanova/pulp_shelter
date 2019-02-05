@@ -16,9 +16,9 @@ from . import models
 # If your content type has many artifacts per content unit, use "MultipleArtifactContentSerializer"
 # If you change this, make sure to do so on "fields" below, also.
 # Make sure your choice here matches up with the create() method of your viewset.
-class ShelterContentSerializer(platform.SingleArtifactContentSerializer):
+class AnimalSerializer(platform.SingleArtifactContentSerializer):
     """
-    A Serializer for ShelterContent.
+    A Serializer for Animal.
 
     Add serializers for the new fields defined in ShelterContent and
     add those fields to the Meta class keeping fields from the parent class as well.
@@ -35,10 +35,53 @@ class ShelterContentSerializer(platform.SingleArtifactContentSerializer):
         )
         model = models.ShelterContent
     """
+    species = serializers.CharField(
+        help_text="Species of an animal in a shelter"
+    )
+    breed = serializers.CharField(
+        help_text="Breed of an animal in a shelter"
+    )
+    name = serializers.CharField(
+        help_text="Name of an animal in a shelter"
+    )
+    age = serializers.IntegerField(
+        help_text="Age of an animal when it arrived to a shelter",
+        allow_blank=True,
+        required=False
+    )
+    sex	= serializers.ChoiceField(
+        help_text="Gender of an animal",
+        choices = models.Animal.GENDER_CHOICES,
+        default = models.Animal.UNKNOWN
+    )
+    weight = serializers.FloatField(
+        help_text="Weight of an animal upon arrival to a shelter",
+        allow_blank=True,
+        required=False
+    )
+    bio = serializers.TextField(
+        help_text="All information available about an animal",
+        allow_blank=True,
+        required=False
+    )
+    shelter = serializers.CharField(
+        help_text="Name of a shelter the animal is currently in or a name of the last shelter "
+                  "in case it was adopted"
+    )
+    reserved = serializers.BooleanField(
+        help_text="A flag to show if an animal is reserved for adoption"
+    )
+    picture = serializers.CharField(
+        help_text="Relative path to an animal's picture in a repository"
+    )
 
     class Meta:
-        fields = platform.SingleArtifactContentSerializer.Meta.fields
-        model = models.ShelterContent
+        fields = platform.SingleArtifactContentSerializer.Meta.fields + ('species', 'breed',
+                                                                         'name', 'age', 'sex',
+                                                                         'weight', 'bio',
+                                                                         'shelter', 'reserved',
+                                                                         'picture')
+        model = models.Animal
 
 
 class ShelterRemoteSerializer(platform.RemoteSerializer):
