@@ -115,6 +115,12 @@ class ShelterPublisherSerializer(platform.PublisherSerializer):
         validators = platform.PublisherSerializer.Meta.validators + [myValidator1, myValidator2]
     """
 
+    manifest_file = serializers.CharField(
+        help_text='Name of the shelter manifest, the full path will be url/manifest',
+        required=False,
+        default='shelter_manifest.json'
+    )
+
     class Meta:
-        fields = platform.PublisherSerializer.Meta.fields
+        fields = platform.PublisherSerializer.Meta.fields + ('manifest_file',)
         model = models.ShelterPublisher

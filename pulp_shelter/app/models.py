@@ -67,6 +67,8 @@ class ShelterPublisher(Publisher):
     """
 
     TYPE = 'shelter'
+    manifest_file = models.TextField()
+
 
 
 class ShelterRemote(Remote):
