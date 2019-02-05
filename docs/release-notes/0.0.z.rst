@@ -1,0 +1,5 @@
+===================================
+shelter 0.0.1 Release Notes
+===================================
+
+shelter was created, and there was much rejoicing.
