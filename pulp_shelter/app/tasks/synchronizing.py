@@ -1,5 +1,9 @@
 from gettext import gettext as _
+import json
 import logging
+import os
+
+from urllib.parse import urlparse, urlunparse
 
 from pulpcore.plugin.models import Artifact, ProgressBar, Remote, Repository
 from pulpcore.plugin.stages import (
@@ -58,9 +62,10 @@ class ShelterFirstStage(Stage):
             remote (FileRemote): The remote data to be used when syncing
 
         """
+        super().__init__()
         self.remote = remote
 
-    async def __call__(self, in_q, out_q):
+    async def run(self):
         """
         Build and emit `DeclarativeContent` from the Manifest data.
 
@@ -69,22 +74,30 @@ class ShelterFirstStage(Stage):
             out_q (asyncio.Queue): The out_q to send `DeclarativeContent` objects to
 
         """
-        downloader = self.remote.get_downloader(url=self.remote.url)
-        result = await downloader.run()
-        # Use ProgressBar to report progress
-        for entry in self.read_my_metadata_file_somehow(result.path):
-            unit = ShelterContent(entry)  # make the content unit in memory-only
-            artifact = Artifact(entry)  # make Artifact in memory-only
-            da = DeclarativeArtifact(artifact, entry.url, entry.relative_path, self.remote)
-            dc = DeclarativeContent(content=unit, d_artifacts=[da])
-            await out_q.put(dc)
-        await out_q.put(None)
+        with ProgressBar(message='Downloading Metadata') as pb:
+            parsed_url = urlparse(self.remote.url)
+            root_dir = os.path.dirname(parsed_url.path)
+            downloader = self.remote.get_downloader(url=self.remote.url)
+            result = await downloader.run()
+            pb.increment()
 
-    def read_my_metadata_file_somehow(path):
+        with ProgressBar(message='Parsing Metadata') as pb:
+            for entry in self.read_my_metadata_file_somehow(result.path):
+                path = os.path.join(root_dir, entry['picture'])
+                url = urlunparse(parsed_url._replace(path=path))
+                unit = Animal(**entry)  # make the content unit in memory-only
+                artifact = Artifact()  # make Artifact in memory-only
+                da =  DeclarativeArtifact(artifact, url, entry['picture'], self.remote)
+                dc = DeclarativeContent(content=unit, d_artifacts=[da])
+                pb.increment()
+                await self.put(dc)
+
+    def read_my_metadata_file_somehow(self, path):
         """
         Parse the metadata for shelter Content type.
 
         Args:
             path: Path to the metadata file
         """
-        pass
+        with open(path) as f:
+            return json.loads(f.read())
